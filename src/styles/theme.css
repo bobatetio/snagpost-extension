@@ -1,0 +1,159 @@
+/* SocialPulse design tokens — both light + dark modes.
+ *
+ * Loaded as a raw string and injected into the panel's Shadow DOM, so these
+ * variables stay scoped — they will not leak into Facebook and Facebook
+ * styles cannot reach inside the panel.
+ *
+ * Default :host = DARK mode.
+ * :host([data-theme="light"]) overrides for LIGHT mode.
+ *
+ * Panel.tsx / preview / content script flip the `data-theme="light"`
+ * attribute on the shadow host when the user toggles to light mode.
+ */
+
+:host {
+  /* ============================================================
+   * DARK MODE (default)
+   * ============================================================ */
+
+  /* Surfaces */
+  --frame-bg:        #E9E0FF;
+  --panel-bg:        #111232;
+  --card-bg-from:    #111232;
+  --card-bg-to:      rgba(52, 55, 152, 0.61);
+  --card-border:     #1D1F49;
+
+  /* Profile glass strip — solid (no gradient) */
+  --profile-glass: #2B2C52;
+
+  /* Inner badge — solid deep navy w/ white text in dark mode. */
+  --badge-grad:     #111232;
+  --badge-fg:       #FFFFFF;
+  --badge-label-fg: rgba(217, 225, 250, 0.85);
+
+  /* Synced pill — solid dark navy */
+  --synced-grad: #343798;
+
+  /* CTA — solid brand purple */
+  --cta-grad:   #8D72FF;
+  --cta-glow:   0 8px 24px -8px rgba(141, 114, 255, 0.45);
+
+  /* Day-of-week bar — solid brand purple */
+  --bar-grad:   #8D72FF;
+
+  /* Brand */
+  --brand-purple: #8D72FF;
+
+  /* Text — light on dark surfaces */
+  --ink-primary:   #FFFFFF;
+  --ink-secondary: rgba(255, 255, 255, 0.73);
+  --ink-muted:     #AEB9E1;
+  --ink-soft:      #D9E1FA;
+  --ink-section:   rgba(174, 185, 225, 0.89);
+
+  /* Track + divider — translucent white on dark surfaces */
+  --track-bg:      rgba(255, 255, 255, 0.10);
+  --divider:       rgba(255, 255, 255, 0.07);
+
+  /* Type tone colors — graduated purple palette (same on both modes) */
+  --tone-video:     #8C7BF6;
+  --tone-carousel:  #7967D7;
+  --tone-slideshow: #C6B5FA;
+  --tone-photo:     #DBD0FA;
+  --tone-link:      #E5E0F8;
+
+  /* Composition metric → tone aliases */
+  --metric-likes:    var(--tone-video);
+  --metric-comments: var(--tone-carousel);
+  --metric-shares:   var(--tone-slideshow);
+
+  /* Legacy type-* aliases (so any older references still resolve) */
+  --type-video-fg:     var(--tone-video);
+  --type-carousel-fg:  var(--tone-carousel);
+  --type-slideshow-fg: var(--tone-slideshow);
+  --type-photo-fg:     var(--tone-photo);
+  --type-link-fg:      var(--tone-link);
+
+  /* Radii */
+  --radius-frame:  30px;
+  --radius-panel:  30px;
+  --radius-card:   16px;
+  --radius-pill:   999px;
+  --radius-badge:  11px;
+  --radius-thumb:  10px;
+  --radius-bar:    8px;
+
+  /* Type — Mona Sans across the panel */
+  --font-display: "Mona Sans", "Inter", system-ui, -apple-system, sans-serif;
+  --font-ui:      "Mona Sans", "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Motion */
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft:    cubic-bezier(0.25, 0.1, 0.25, 1);
+  --motion-card:  180ms;
+  --motion-panel: 240ms;
+
+  /* Surface aliases used by legacy selectors (auth flow, empty states) */
+  --surface-page-solid: var(--frame-bg);
+  --surface-page:       var(--frame-bg);
+  --surface-card:       var(--panel-bg);
+  --surface-soft:       rgba(255, 255, 255, 0.06);
+  --surface-deep:       var(--panel-bg);
+  --border-hairline:    var(--divider);
+  --card-stroke:        var(--card-border);
+  --card-stroke-strong: var(--brand-purple);
+  --card-inner:         inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --glass-blur:         blur(20px) saturate(140%);
+  --primary-deep:       var(--brand-purple);
+  --primary-mid:        #B19AFF;
+  --primary-glow:       #C8B8FF;
+  --primary-wash:       rgba(141, 114, 255, 0.18);
+  --shadow-card:        0 8px 24px rgba(11, 13, 35, 0.35);
+  --shadow-card-hover:  0 12px 32px rgba(11, 13, 35, 0.45);
+  --shadow-bubble:      0 8px 28px rgba(141, 114, 255, 0.45);
+  --bloom-tint:         rgba(141, 114, 255, 0.20);
+  --pill-bg:            rgba(255, 255, 255, 0.06);
+  --pill-fg:            var(--ink-muted);
+  --pill-strong-bg:     var(--brand-purple);
+  --pill-strong-fg:     #FFFFFF;
+
+  /* Layering */
+  --z-bubble: 2147483640;
+  --z-panel:  2147483641;
+}
+
+/* ============================================================
+ * LIGHT MODE — overrides only
+ * ============================================================ */
+:host([data-theme="light"]) {
+  --panel-bg:        #FFFFFF;
+  --card-bg-from:    #FFFFFF;
+  --card-bg-to:      rgba(141, 114, 255, 0.06);
+  --card-border:     rgba(141, 114, 255, 0.18);
+
+  /* Profile glass — solid pale lavender */
+  --profile-glass: #DDD3FA;
+  --badge-grad:     #FFFFFF;
+  --badge-fg:       var(--ink-primary);
+  --badge-label-fg: var(--ink-muted);
+  --synced-grad:    #8D72FF;
+
+  /* Text — dark on light surfaces */
+  --ink-primary:   #0F0F1A;
+  --ink-secondary: rgba(15, 15, 26, 0.72);
+  --ink-muted:     #6B6B82;
+  --ink-soft:      #3F3F55;
+  --ink-section:   rgba(15, 15, 26, 0.55);
+
+  --track-bg:      rgba(15, 15, 26, 0.08);
+  --divider:       rgba(15, 15, 26, 0.06);
+
+  --surface-soft:  rgba(15, 15, 26, 0.04);
+  --surface-deep:  #FFFFFF;
+
+  --shadow-card:        0 6px 18px rgba(11, 13, 35, 0.06);
+  --shadow-card-hover:  0 12px 24px rgba(11, 13, 35, 0.10);
+  --card-inner:         inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  --primary-wash:       rgba(141, 114, 255, 0.10);
+}

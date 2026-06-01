@@ -1,0 +1,1087 @@
+/* SocialPulse panel — 1:1 with the Figma file (node 8:46).
+ *
+ * Two surfaces: an outer pale-lavender frame and a dark navy inner panel
+ * that holds all content. Section labels sit OUTSIDE cards. Cards use a
+ * gradient fill (#111232 → rgba(52,55,152,0.61)) with a 2px #1D1F49 border. */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+button { font: inherit; background: none; border: 0; cursor: pointer; color: inherit; }
+
+.panel-root {
+  font-family: var(--font-ui);
+  color: var(--ink-primary);
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+ * Bubble — kept simple; injects on Facebook profile pages.
+ * ============================================================ */
+.bubble {
+  position: fixed;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--brand-purple);
+  box-shadow: var(--shadow-bubble);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-bubble);
+  transition: transform 180ms var(--ease-out);
+  pointer-events: auto;
+  color: #fff;
+}
+.bubble:hover { transform: translateY(-50%) scale(1.04); }
+.bubble[data-hidden="true"] { opacity: 0; pointer-events: none; transform: translateY(-50%) scale(0.92); }
+.bubble[data-flash="true"] { animation: bubble-flash 700ms var(--ease-out); }
+@keyframes bubble-flash {
+  0%   { transform: translateY(-50%) scale(1); }
+  40%  { transform: translateY(-50%) scale(1.08); }
+  100% { transform: translateY(-50%) scale(1); }
+}
+
+/* ============================================================
+ * Panel (outer pale-lavender frame)
+ * ============================================================ */
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 400px;
+  max-width: 100vw;
+  background: var(--frame-bg);
+  border-radius: 0;
+  z-index: var(--z-panel);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateX(100%);
+  transition: transform var(--motion-panel) var(--ease-out);
+  box-shadow: -8px 0 32px rgba(11, 13, 35, 0.18);
+  pointer-events: auto;
+}
+.panel[data-open="false"] { pointer-events: none; }
+.panel[data-open="true"]  { transform: translateX(0); }
+
+/* Header (sits on the pale frame) */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  flex-shrink: 0;
+}
+
+/* Wordmark */
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.wordmark-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--brand-purple);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.wordmark-text {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: #0F0F0F;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.wordmark-light { font-weight: 500; }
+.wordmark-bold  { font-weight: 700; }
+
+/* Theme toggle + close, inside a single purple pill */
+.panel-header-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px;
+  background: var(--brand-purple);
+  border-radius: 999px;
+  color: #fff;
+}
+.panel-header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  transition: opacity 120ms ease;
+}
+.panel-header-btn:hover { opacity: 0.85; }
+.panel-header-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ============================================================
+ * Inner dark panel — holds profile card, Export, sections.
+ * Scrolls vertically.
+ * ============================================================ */
+.panel-inner {
+  flex: 1;
+  margin: 0 4px 4px;
+  padding: 10px;
+  background: var(--panel-bg);
+  border-radius: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.panel-inner[data-auth="true"] { padding: 0; gap: 0; }
+
+/* Hide the scrollbar visually so the inner panel reads as symmetric
+ * left/right. Wheel + touch scrolling still works. */
+.panel-inner { scrollbar-width: none; }
+.panel-inner::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* ============================================================
+ * Sticky stack — profile card + Export button stay pinned at the
+ * top of the scrolling inner panel. Opaque bg + extended margins
+ * cover scrolling analytics so nothing leaks behind them.
+ * ============================================================ */
+.sp-sticky-stack {
+  position: sticky;
+  top: -10px;                         /* offsets panel-inner padding-top so the bg flush-fills */
+  z-index: 5;
+  background: var(--panel-bg);
+  margin: -10px -10px 0;              /* cancel panel-inner side+top padding */
+  padding: 10px 10px 12px;            /* restore inner content padding */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ============================================================
+ * Profile glass card — multi-stop horizontal gradient strip.
+ * ============================================================ */
+.sp-profile-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 90px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--profile-glass);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sp-profile-badge {
+  position: relative;
+  width: 80px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--badge-grad);
+  color: var(--badge-fg);
+  gap: 3px;
+}
+.sp-profile-badge-num {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+.sp-profile-badge-label {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--badge-label-fg);
+}
+
+.sp-profile-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+/* Muted lines: ALWAYS one line, never wrap. The card layout below guarantees
+ * enough horizontal room for "Scroll Down To Collect More Posts". */
+.sp-profile-line-muted {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  line-height: 1.3;
+  white-space: nowrap;
+}
+/* @username stays one line + ellipsis (usernames can be long). */
+.sp-profile-line-strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+
+.sp-synced-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--synced-grad);
+  white-space: nowrap;
+  align-self: center;
+}
+.sp-synced-pill[data-state="synced"] svg { color: #B9F0D4; }
+.sp-synced-pill[data-state="capturing"] {
+  background: var(--brand-purple);
+}
+
+.sp-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+  animation: sp-pulse 1.2s ease-in-out infinite;
+}
+@keyframes sp-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.9); }
+  50%      { opacity: 1;    transform: scale(1.1); }
+}
+
+/* ============================================================
+ * Export to Dashboard button — full-width iridescent purple.
+ * ============================================================ */
+.sp-export-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  padding: 0 16px;
+  background: var(--cta-grad);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.005em;
+  transition: filter 120ms ease, transform 120ms ease;
+  flex-shrink: 0;
+}
+.sp-export-cta:hover  { filter: brightness(1.06); transform: translateY(-1px); }
+.sp-export-cta:active { transform: translateY(0); filter: brightness(0.97); }
+
+/* ============================================================
+ * Section pattern: uppercase label OUTSIDE, card INSIDE.
+ * ============================================================ */
+.sp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sp-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 2px;
+}
+.sp-section-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-section);
+}
+.sp-section-label-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.sp-section-info {
+  color: var(--ink-section);
+  opacity: 0.75;
+}
+.sp-section-info-wrap {
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+}
+.sp-section-strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Shared card surface */
+.sp-card {
+  background: var(--card-bg-from);
+  border: 1.5px solid var(--card-border);
+  border-radius: 14px;
+}
+
+/* ============================================================
+ * Engagement card — 4 stats in a row (no dividers).
+ * ============================================================ */
+.sp-engagement-card {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 14px 8px;
+  gap: 0;
+}
+.sp-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+.sp-metric-value {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink-primary);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.sp-metric-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* ============================================================
+ * Post types — donut + legend
+ * ============================================================ */
+.sp-types-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+.sp-donut-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 12px;
+}
+.sp-donut {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex: 0 0 120px;
+  aspect-ratio: 1 / 1;
+  filter: drop-shadow(0 0 16px rgba(141, 114, 255, 0.25));
+}
+.sp-donut-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+/* Hole sits over the SVG; pointer-events: none so SVG slice hovers fire. */
+.sp-donut-hole {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+}
+.sp-donut-total {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.sp-donut-sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+/* Legend is a 2-column grid: (dot+name) / value. A dedicated divider
+ * row between content rows draws ONE continuous hairline spanning both
+ * columns (avoids the per-cell border splitting at the column-gap). */
+.sp-types-legend {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  column-gap: 28px;
+  row-gap: 4px;
+  list-style: none;
+  min-width: 0;
+  align-items: center;
+  justify-self: end;
+  margin-right: 18px;
+}
+.sp-types-row { display: contents; }
+.sp-types-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sp-types-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--divider);
+}
+
+/* ============================================================
+ * Hover tooltip — used on donut legend rows, composition rows,
+ * and day-of-week bars. Matches the TokScript chip style.
+ * ============================================================ */
+/* Tooltip wrap: only owns position context. Layout/display comes from the
+ * merged className (sp-types-left, sp-dow-col, sp-comp-bar-seg, etc.). */
+.sp-tip-wrap {
+  position: relative;
+}
+.sp-tip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  background: #15163A;
+  color: #FFF;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+  white-space: normal;
+  max-width: 220px;
+  width: max-content;
+  z-index: 50;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: sp-tip-in 120ms var(--ease-out);
+}
+.sp-tip-label, .sp-tip-hint { text-transform: none; letter-spacing: 0; }
+.sp-tip[data-side="top"]    { bottom: calc(100% + 6px); }
+.sp-tip[data-side="bottom"] { top: calc(100% + 6px); }
+.sp-tip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+}
+.sp-tip[data-side="top"]::after {
+  top: 100%;
+  border-top-color: #15163A;
+}
+.sp-tip[data-side="bottom"]::after {
+  bottom: 100%;
+  border-bottom-color: #15163A;
+}
+.sp-tip-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sp-tip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.sp-tip-label { font-weight: 600; }
+.sp-tip-hint  {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  font-weight: 400;
+}
+@keyframes sp-tip-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(2px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+}
+.sp-types-name {
+  color: var(--ink-muted);
+  font-weight: 400;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-types-value {
+  color: var(--ink-soft);
+  font-weight: 500;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Tone dots (used in donut legend) */
+.sp-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.sp-dot[data-tone="video"]     { background: var(--tone-video); }
+.sp-dot[data-tone="carousel"]  { background: var(--tone-carousel); }
+.sp-dot[data-tone="slideshow"] { background: var(--tone-slideshow); }
+.sp-dot[data-tone="photo"]     { background: var(--tone-photo); }
+.sp-dot[data-tone="link"]      { background: var(--tone-link); }
+.sp-dot[data-metric="likes"]    { background: var(--tone-video); }
+.sp-dot[data-metric="comments"] { background: var(--tone-carousel); }
+.sp-dot[data-metric="shares"]   { background: var(--tone-slideshow); }
+
+/* ============================================================
+ * Engagement composition — one block per type
+ * ============================================================ */
+.sp-comp-card {
+  padding: 0 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Tab strip — one tab per post type, the active one shows its breakdown. */
+.sp-comp-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--divider);
+  margin: 0 -12px 6px;
+  padding: 0 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sp-comp-tabs::-webkit-scrollbar { display: none; }
+.sp-comp-tab {
+  position: relative;
+  padding: 9px 8px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: transparent;
+  white-space: nowrap;
+  transition: color 120ms ease;
+}
+.sp-comp-tab:hover { color: var(--ink-primary); }
+.sp-comp-tab[data-active="true"] {
+  color: var(--brand-purple);
+  font-weight: 600;
+}
+.sp-comp-tab[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--brand-purple);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Summary view: bold count + total engagement, stacked bar with inline
+ * percent labels, and a 2-column legend below. */
+.sp-comp-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sp-comp-summary-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sp-comp-summary-num {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.sp-comp-summary-sub {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+/* No overflow: hidden on bar OR segment — would clip the hover tooltips
+ * above each segment. Border-radius on first/last seg keeps the pill caps. */
+.sp-comp-stacked-bar {
+  display: flex;
+  height: 26px;
+  width: 100%;
+  background: var(--track-bg);
+  border-radius: 8px;
+}
+.sp-comp-stacked-seg {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 0;
+  transition: width 320ms var(--ease-out);
+}
+.sp-comp-stacked-bar > .sp-comp-stacked-seg:first-child { border-radius: 8px 0 0 8px; }
+.sp-comp-stacked-bar > .sp-comp-stacked-seg:last-child  { border-radius: 0 8px 8px 0; }
+.sp-comp-stacked-bar > .sp-comp-stacked-seg:only-child  { border-radius: 8px; }
+.sp-comp-stacked-seg[data-metric="likes"]    { background: var(--tone-video); }
+.sp-comp-stacked-seg[data-metric="comments"] { background: var(--tone-carousel); }
+.sp-comp-stacked-seg[data-metric="shares"]   { background: var(--tone-slideshow); }
+.sp-comp-stacked-pct {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sp-comp-summary-legend {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.sp-comp-summary-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 400;
+  min-width: 0;
+}
+.sp-comp-summary-item b {
+  color: var(--ink-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-left: 2px;
+}
+.sp-comp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+.sp-comp-head-left {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.sp-comp-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-primary);
+}
+.sp-comp-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+/* Live stacked bar: likes (vivid) → comments (deeper) → shares (light).
+ * No overflow: hidden — would clip the hover tooltips above. Round caps
+ * applied to first + last segment instead. */
+.sp-comp-bar {
+  display: flex;
+  height: 4px;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--track-bg);
+}
+.sp-comp-bar-seg {
+  height: 100%;
+  transition: width 320ms var(--ease-out);
+}
+.sp-comp-bar > .sp-comp-bar-seg:first-child { border-radius: 999px 0 0 999px; }
+.sp-comp-bar > .sp-comp-bar-seg:last-child  { border-radius: 0 999px 999px 0; }
+.sp-comp-bar-seg[data-metric="likes"]    { background: var(--tone-video); }
+.sp-comp-bar-seg[data-metric="comments"] { background: var(--tone-carousel); }
+.sp-comp-bar-seg[data-metric="shares"]   { background: var(--tone-slideshow); }
+.sp-comp-legend {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+.sp-comp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.sp-comp-pill-text {
+  line-height: 1;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+.sp-comp-pill-text b { color: var(--ink-muted); font-weight: 600; }
+.sp-comp-divider {
+  height: 1px;
+  width: 100%;
+  background: var(--divider);
+  margin-top: 0;
+}
+
+/* ============================================================
+ * Top performing posts — list of 3 with thumb + caption + stats
+ * ============================================================ */
+.sp-top-card {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sp-top-row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  gap: 10px;
+  row-gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 120ms ease;
+}
+.sp-top-row:hover { opacity: 0.92; }
+.sp-top-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--divider);
+}
+.sp-top-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #D9D9D9;
+}
+.sp-top-thumb-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--brand-purple);
+  background: rgba(141, 114, 255, 0.18);
+}
+.sp-top-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.sp-top-cap {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-primary);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-top-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--ink-muted);
+  font-weight: 400;
+}
+.sp-top-stats b { color: var(--ink-muted); font-weight: 600; }
+
+/* ============================================================
+ * Posts by day of week — bars inside a card
+ * ============================================================ */
+.sp-dow-card {
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sp-dow-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  align-items: end;
+  height: 108px;
+}
+.sp-dow-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+.sp-dow-count {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  line-height: 1;
+}
+.sp-dow-col[data-peak="true"] .sp-dow-count { color: var(--ink-primary); }
+.sp-dow-track {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sp-dow-fill {
+  width: 100%;
+  max-width: 26px;
+  min-height: 3px;
+  background: var(--bar-grad);
+  border-radius: 6px;
+  transition: height 320ms var(--ease-out);
+}
+.sp-dow-axis {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  border-top: 1px solid var(--divider);
+  padding-top: 6px;
+}
+.sp-dow-label {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.sp-dow-label[data-peak="true"] { color: var(--ink-primary); }
+
+/* ============================================================
+ * Empty states
+ * ============================================================ */
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 24px;
+  gap: 12px;
+  color: var(--ink-muted);
+}
+.empty-title  { font-size: 16px; font-weight: 700; color: var(--ink-primary); }
+.empty-body   { font-size: 13px; line-height: 1.45; max-width: 280px; }
+.empty-cta {
+  margin-top: 4px;
+  padding: 10px 18px;
+  background: var(--cta-grad);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.empty-cta:hover { filter: brightness(1.05); }
+
+/* ============================================================
+ * Auth / onboarding flow — runs INSIDE the inner dark panel.
+ * Kept minimal here (the auth components own most of their look);
+ * background is transparent so the dark inner panel shows through.
+ * ============================================================ */
+.auth-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  color: #fff;
+  background: transparent;
+}
+.auth-flow h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+  color: #fff;
+}
+.auth-flow .lede {
+  margin-top: -8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.auth-flow .divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 2px -20px 0;
+}
+.auth-flow .auth-body { display: flex; flex-direction: column; gap: 12px; }
+.auth-flow .auth-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+.auth-flow .auth-footer.center { justify-content: center; }
+.auth-flow .auth-footer-text {
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.auth-flow .auth-footer-text a {
+  color: var(--brand-purple);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.auth-flow .field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  height: 46px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+}
+.auth-flow .field:focus-within { border-color: var(--brand-purple); }
+.auth-flow .field-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+.auth-flow .field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #fff;
+  min-width: 0;
+  font-family: inherit;
+}
+.auth-flow .field input::placeholder { color: var(--ink-muted); }
+
+.auth-flow .field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -4px;
+  font-size: 12px;
+  color: #FF8AA0;
+}
+.auth-flow .field-error-icon { color: #FF8AA0; display: inline-flex; align-items: center; }
+
+.auth-flow .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
+  font-family: inherit;
+}
+.auth-flow .btn-primary {
+  background: var(--cta-grad);
+  color: #fff;
+  width: 100%;
+  box-shadow: var(--cta-glow);
+}
+.auth-flow .btn-primary:hover:not(:disabled) { filter: brightness(1.05); }
+.auth-flow .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.auth-flow .btn-ghost {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #fff;
+  width: 100%;
+}
+.auth-flow .btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.10); }
+
+.auth-flow .or-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin: 2px 0;
+}
+
+.auth-flow .scanning-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 12px;
+  text-align: center;
+  gap: 16px;
+}
+.auth-flow .scanning-ring {
+  width: 132px;
+  height: 132px;
+  border-radius: 999px;
+  background: transparent;
+  border: 8px solid rgba(255, 255, 255, 0.10);
+  border-top-color: var(--brand-purple);
+  position: relative;
+  animation: spin 1.6s linear infinite;
+}
+.auth-flow .scanning-ring::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: 999px;
+  background: var(--panel-bg);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.auth-flow .scanning-title { font-size: 22px; font-weight: 800; color: #fff; }
+.auth-flow .scanning-sub   { font-size: 13px; color: var(--ink-muted); max-width: 280px; line-height: 1.5; }
